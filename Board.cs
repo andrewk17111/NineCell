@@ -59,6 +59,21 @@ internal class Board
         return true;
     }
 
+    private bool CheckHouseCondition(int x, int y)
+    {
+        int cell = GetCell(x, y);
+
+        if (cell == 0)
+            return true;
+
+        for (int j = y / 3 * 3; j < y / 3 * 3 + 1; j++)
+            for (int i = x / 3 * 3; i < x / 3 * 3 + 1; i++)
+                if (_board[i, j] == cell)
+                    return false;
+
+        return true;
+    }
+
     public override string ToString()
     {
         string output = "┌───┬───┬───┐\n│";
