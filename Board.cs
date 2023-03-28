@@ -58,14 +58,22 @@ internal class Board
     /// <param name="y">The column of the cell.</param>
     /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
     private bool CheckColumnCondition(int x, int y)
-    {
-        int cell = GetCell(x, y);
+        => CheckColumnCondition(x, y, GetCell(x, y));
 
-        if (cell == 0)
+    /// <summary>
+    /// Checks whether a particular value at a cell is unique within a column.
+    /// </summary>
+    /// <param name="x">The row of the cell.</param>
+    /// <param name="y">The column of the cell.</param>
+    /// <param name="value">The value to check.</param>
+    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
+    private bool CheckColumnCondition(int x, int y, int value)
+    {
+        if (value == 0)
             return true;
 
-        for (int i = 0;  i < _board.GetLength(1); i++)
-            if (i != y && _board[x, i] == cell)
+        for (int i = 0; i < _board.GetLength(1); i++)
+            if (i != y && _board[x, i] == value)
                 return false;
 
         return true;
@@ -78,14 +86,22 @@ internal class Board
     /// <param name="y">The column of the cell.</param>
     /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
     private bool CheckRowCondition(int x, int y)
-    {
-        int cell = GetCell(x, y);
+        => CheckRowCondition(x, y, GetCell(x, y));
 
-        if (cell == 0)
+    /// <summary>
+    /// Checks whether a particular value at a cell is unique within a row.
+    /// </summary>
+    /// <param name="x">The row of the cell.</param>
+    /// <param name="y">The column of the cell.</param>
+    /// <param name="value">The value to check.</param>
+    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
+    private bool CheckRowCondition(int x, int y, int value)
+    {
+        if (value == 0)
             return true;
 
         for (int i = 0; i < _board.GetLength(0); i++)
-            if (i != x && _board[i, y] == cell)
+            if (i != x && _board[i, y] == value)
                 return false;
 
         return true;
@@ -98,15 +114,22 @@ internal class Board
     /// <param name="y">The column of the cell.</param>
     /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
     private bool CheckHouseCondition(int x, int y)
-    {
-        int cell = GetCell(x, y);
+        => CheckHouseCondition(x, y, GetCell(x, y));
 
-        if (cell == 0)
+    /// <summary>
+    /// Checks whether the value of a cell is unique within a house.
+    /// </summary>
+    /// <param name="x">The row of the cell.</param>
+    /// <param name="y">The column of the cell.</param>
+    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
+    private bool CheckHouseCondition(int x, int y, int value)
+    {
+        if (value == 0)
             return true;
 
         for (int j = y / 3 * 3; j < y / 3 * 3 + 1; j++)
             for (int i = x / 3 * 3; i < x / 3 * 3 + 1; i++)
-                if (j != y && i != x && _board[i, j] == cell)
+                if (j != y && i != x && _board[i, j] == value)
                     return false;
 
         return true;
