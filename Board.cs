@@ -44,12 +44,49 @@ internal class Board
     /// </summary>
     /// <param name="x">The row of the cell.</param>
     /// <param name="y">The column of the cell.</param>
-    /// <param name="value"></param>
+    /// <param name="value">The value of the cell.</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if <c>value</c> is out of range.</exception>
     public void SetCell(int x, int y, int value)
         => _board[x, y] = value < 0 || value > 9
             ? throw new ArgumentOutOfRangeException(nameof(value), value, $"Cell value must be between 0 and 9")
             : value;
+
+    /// <summary>
+    /// Tries to set the value of a cell in the board.
+    /// </summary>
+    /// <param name="x">The row of the cell.</param>
+    /// <param name="y">The column of the cell.</param>
+    /// <param name="value">The value of the cell.</param>
+    /// <returns><c>true</c> if the cell value was set; <c>false</c> otherwise.</returns>
+    public bool TrySetCell(int x, int y, int value)
+    {
+        if (IsValid(x, y, value))
+        {
+            SetCell(x, y, value);
+            return true;
+        }
+        
+        return false;
+    }
+
+    /// <summary>
+    /// Checks whether a value of a cell is valid.
+    /// </summary>
+    /// <param name="x">The row of the cell.</param>
+    /// <param name="y">The column of the cell.</param>
+    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
+    public bool IsValid(int x, int y)
+        => IsValid(x, y, GetCell(x, y));
+
+    /// <summary>
+    /// Checks whether a value at a cell is valid.
+    /// </summary>
+    /// <param name="x">The row of the cell.</param>
+    /// <param name="y">The column of the cell.</param>
+    /// <param name="value">The value to check.</param>
+    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
+    public bool IsValid(int x, int y, int value)
+        => CheckColumnCondition(x, y, value) && CheckRowCondition(x, y, value) && CheckHouseCondition(x, y, value);
 
     /// <summary>
     /// Checks whether the value of a cell is unique within a column.
