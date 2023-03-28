@@ -27,7 +27,9 @@ internal class Board
         => _board[x, y];
 
     public void SetCell(int x, int y, int value)
-        => _board[x, y] = value;
+        => _board[x, y] = value < 0 || value > 9
+            ? throw new ArgumentOutOfRangeException(nameof(value), value, $"Cell value must be between 0 and 9")
+            : value;
 
     public override string ToString()
     {
@@ -37,7 +39,9 @@ internal class Board
         {
             for (int x = 0; x < _board.GetLength(0); x++)
             {
-                output += _board[x, y];
+                output += _board[x, y] == 0
+                    ? " "
+                    : _board[x, y];
 
                 if (x % 3 == 2)
                 {
