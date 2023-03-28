@@ -39,7 +39,7 @@ internal class Board
             return true;
 
         for (int i = 0;  i < _board.GetLength(1); i++)
-            if (_board[x, i] == cell)
+            if (i != y && _board[x, i] == cell)
                 return false;
 
         return true;
@@ -53,7 +53,7 @@ internal class Board
             return true;
 
         for (int i = 0; i < _board.GetLength(0); i++)
-            if (_board[i, y] == cell)
+            if (i != x && _board[i, y] == cell)
                 return false;
 
         return true;
@@ -68,7 +68,7 @@ internal class Board
 
         for (int j = y / 3 * 3; j < y / 3 * 3 + 1; j++)
             for (int i = x / 3 * 3; i < x / 3 * 3 + 1; i++)
-                if (_board[i, j] == cell)
+                if (j != y && i != x && _board[i, j] == cell)
                     return false;
 
         return true;
