@@ -4,11 +4,18 @@ internal class Board
 {
     private readonly int[,] _board;
 
+    /// <summary>
+    /// Creates a new sudoku Board.
+    /// </summary>
     public Board()
     {
         _board = InitBoard();
     }
 
+    /// <summary>
+    /// Initializes a new sudoku board.
+    /// </summary>
+    /// <returns>An int[,] that represents the sudoku board.</returns>
     private static int[,] InitBoard()
         => new int[,]
         {
@@ -23,14 +30,33 @@ internal class Board
             { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
         };
 
+    /// <summary>
+    /// Get the value of a cell in the board.
+    /// </summary>
+    /// <param name="x">The row of the cell.</param>
+    /// <param name="y">The column of the cell.</param>
+    /// <returns>The int value of the cell.</returns>
     public int GetCell(int x, int y)
         => _board[x, y];
 
+    /// <summary>
+    /// Set the value of a cell in the board.
+    /// </summary>
+    /// <param name="x">The row of the cell.</param>
+    /// <param name="y">The column of the cell.</param>
+    /// <param name="value"></param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <c>value</c> is out of range.</exception>
     public void SetCell(int x, int y, int value)
         => _board[x, y] = value < 0 || value > 9
             ? throw new ArgumentOutOfRangeException(nameof(value), value, $"Cell value must be between 0 and 9")
             : value;
 
+    /// <summary>
+    /// Checks whether the value of a cell is unique within a column.
+    /// </summary>
+    /// <param name="x">The row of the cell.</param>
+    /// <param name="y">The column of the cell.</param>
+    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
     private bool CheckColumnCondition(int x, int y)
     {
         int cell = GetCell(x, y);
@@ -45,6 +71,12 @@ internal class Board
         return true;
     }
 
+    /// <summary>
+    /// Checks whether the value of a cell is unique within a row.
+    /// </summary>
+    /// <param name="x">The row of the cell.</param>
+    /// <param name="y">The column of the cell.</param>
+    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
     private bool CheckRowCondition(int x, int y)
     {
         int cell = GetCell(x, y);
@@ -59,6 +91,12 @@ internal class Board
         return true;
     }
 
+    /// <summary>
+    /// Checks whether the value of a cell is unique within a house.
+    /// </summary>
+    /// <param name="x">The row of the cell.</param>
+    /// <param name="y">The column of the cell.</param>
+    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
     private bool CheckHouseCondition(int x, int y)
     {
         int cell = GetCell(x, y);
