@@ -31,6 +31,34 @@ internal class Board
             ? throw new ArgumentOutOfRangeException(nameof(value), value, $"Cell value must be between 0 and 9")
             : value;
 
+    private bool CheckColumnCondition(int x, int y)
+    {
+        int cell = GetCell(x, y);
+
+        if (cell == 0)
+            return true;
+
+        for (int i = 0;  i < _board.GetLength(1); i++)
+            if (_board[x, i] == cell)
+                return false;
+
+        return true;
+    }
+
+    private bool CheckRowCondition(int x, int y)
+    {
+        int cell = GetCell(x, y);
+
+        if (cell == 0)
+            return true;
+
+        for (int i = 0; i < _board.GetLength(0); i++)
+            if (_board[i, y] == cell)
+                return false;
+
+        return true;
+    }
+
     public override string ToString()
     {
         string output = "┌───┬───┬───┐\n│";
