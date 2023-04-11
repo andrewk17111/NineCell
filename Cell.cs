@@ -22,8 +22,8 @@ internal class Cell
     public Cell(int x, int y, Board board)
     {
         _board = board;
-        Value = 0;
         _notes = new List<byte>(Utils.Range(Utils.MIN_VALUE, Utils.MAX_VALUE));
+        Value = 0;
         X = x;
         Y = y;
 

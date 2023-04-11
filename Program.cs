@@ -54,6 +54,8 @@ void ProcessInput(ConsoleKey key)
             Console.CursorLeft -= 1;
         }
     }
+
+    PrintNotes();
 }
 
 static byte GetValueFromKey(ConsoleKey key)
@@ -65,3 +67,15 @@ static byte GetValueFromKey(ConsoleKey key)
 
 static (int, int) ConvertPosition(int x, int y)
     => (x - x / 4 - 1, y - y / 4 - 1);
+
+void PrintNotes()
+{
+    (int left, int top) = Console.GetCursorPosition();
+    (int x, int y) = ConvertPosition(left, top);
+
+    Console.SetCursorPosition(13, 0);
+    Console.Write("                         ");
+    Console.SetCursorPosition(13, 0);
+    Console.Write(String.Join(", ", board[x, y].Notes));
+    Console.SetCursorPosition(left, top);
+}
