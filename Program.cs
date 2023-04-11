@@ -1,5 +1,4 @@
 ﻿using NineCell;
-using System.Text.RegularExpressions;
 
 Board board = new Board();
 
@@ -45,29 +44,24 @@ void ProcessInput(ConsoleKey key)
     }
     else if ((key >= ConsoleKey.D0 && key <= ConsoleKey.D9) || (key >= ConsoleKey.NumPad0 && key <= ConsoleKey.NumPad9))
     {
-        int value = GetValueFromKey(key);
+        byte value = GetValueFromKey(key);
         (int x, int y) = ConvertPosition(Console.CursorLeft, Console.CursorTop);
 
-        if (value == 0)
+        if (board[x, y] != value)
         {
-            board.SetCell(x, y, 0);
-            Console.Write(" ");
-            Console.CursorLeft -= 1;
-        }
-        else if (board.TrySetCell(x, y, value))
-        {
-            Console.Write(value);
+            board[x, y].Value = value;
+            Console.Write(board[x, y]);
             Console.CursorLeft -= 1;
         }
     }
 }
 
-static int GetValueFromKey(ConsoleKey key)
+static byte GetValueFromKey(ConsoleKey key)
     => key >= ConsoleKey.D0 && key <= ConsoleKey.D9
-        ? key - ConsoleKey.D0
+        ? (byte)(key - ConsoleKey.D0)
         : key >= ConsoleKey.NumPad0 && key <= ConsoleKey.NumPad9
-            ? key - ConsoleKey.NumPad0
-            : 0;
+            ? (byte)(key - ConsoleKey.NumPad0)
+            : (byte)0;
 
 static (int, int) ConvertPosition(int x, int y)
     => (x - x / 4 - 1, y - y / 4 - 1);
