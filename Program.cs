@@ -54,6 +54,20 @@ void ProcessInput(ConsoleKey key)
             Console.CursorLeft -= 1;
         }
     }
+    else if (key == ConsoleKey.Enter || key == ConsoleKey.Spacebar)
+    {
+        if (board.UpdateNotes())
+        {
+            if (board.UpdateValues())
+            {
+                (int left, int top) = Console.GetCursorPosition();
+
+                Console.SetCursorPosition(0, 0);
+                Console.WriteLine(board);
+                Console.SetCursorPosition(left, top);
+            }
+        }
+    }
 
     PrintNotes();
 }

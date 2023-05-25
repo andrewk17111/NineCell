@@ -31,80 +31,64 @@ internal class Board
         return result;
     }
 
-    /// <summary>
-    /// Checks whether a value of a cell is valid.
-    /// </summary>
-    /// <param name="x">The row of the cell.</param>
-    /// <param name="y">The column of the cell.</param>
-    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
-    public bool IsValid(int x, int y)
-        => IsValid(x, y, this[x, y]);
-
-    /// <summary>
-    /// Checks whether a value at a cell is valid.
-    /// </summary>
-    /// <param name="x">The row of the cell.</param>
-    /// <param name="y">The column of the cell.</param>
-    /// <param name="value">The value to check.</param>
-    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
-    public bool IsValid(int x, int y, byte value)
-        => CheckColumnCondition(x, y, value) && CheckRowCondition(x, y, value) && CheckHouseCondition(x, y, value);
-
-    /// <summary>
-    /// Checks whether a particular value at a cell is unique within a column.
-    /// </summary>
-    /// <param name="x">The row of the cell.</param>
-    /// <param name="y">The column of the cell.</param>
-    /// <param name="value">The value to check.</param>
-    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
-    private bool CheckColumnCondition(int x, int y, byte value)
+    public bool UpdateNotes()
     {
-        if (value == 0)
-            return true;
+        bool updated = false;
 
-        for (int i = 0; i < _board.GetLength(1); i++)
-            if (i != y && _board[x, i] == value)
-                return false;
+        for (int y = 0; y < Utils.SIZE; y++)
+            for (int x = 0; x < Utils.SIZE; x++)
+                updated = _board[x, y].UpdateNotes() ? true : updated;
 
-        return true;
+        return updated;
     }
 
-    /// <summary>
-    /// Checks whether a particular value at a cell is unique within a row.
-    /// </summary>
-    /// <param name="x">The row of the cell.</param>
-    /// <param name="y">The column of the cell.</param>
-    /// <param name="value">The value to check.</param>
-    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
-    private bool CheckRowCondition(int x, int y, byte value)
+    public bool UpdateValues()
     {
-        if (value == 0)
-            return true;
+        bool updated = false;
 
-        for (int i = 0; i < _board.GetLength(0); i++)
-            if (i != x && _board[i, y] == value)
-                return false;
+        foreach (Cell cell in _board)
+        {
+            if (cell.Value == 0 && cell.Notes.Length == 1)
+            {
+                cell.Value = cell.Notes[0];
+                updated = true;
+            }
+        }
 
-        return true;
+        return updated;
     }
 
-    /// <summary>
-    /// Checks whether the value of a cell is unique within a house.
-    /// </summary>
-    /// <param name="x">The row of the cell.</param>
-    /// <param name="y">The column of the cell.</param>
-    /// <returns><c>true</c> if the cell value is valid; <c>false</c> otherwise.</returns>
-    private bool CheckHouseCondition(int x, int y, byte value)
+    private Cell[]? GetRow(int index)
     {
-        if (value == 0)
-            return true;
+        if (index >= 0 && index < Utils.SIZE) {
+            List<Cell> result = new List<Cell>();
 
-        for (int j = y / 3 * 3; j < y / 3 * 3 + 1; j++)
-            for (int i = x / 3 * 3; i < x / 3 * 3 + 1; i++)
-                if (j != y && i != x && _board[i, j] == value)
-                    return false;
+            for (int x = 0; x < Utils.SIZE; x++)
+                result.Add(_board[x, index]);
 
-        return true;
+            return result.ToArray();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private Cell[]? GetColumn(int index)
+    {
+        if (index >= 0 && index < Utils.SIZE)
+        {
+            List<Cell> result = new List<Cell>();
+
+            for (int y = 0; y < Utils.SIZE; y++)
+                result.Add(_board[index, y]);
+
+            return result.ToArray();
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public override string ToString()
