@@ -48,10 +48,73 @@ internal class Board
 
         foreach (Cell cell in _board)
         {
+            // Cell has a single note.
             if (cell.Value == 0 && cell.Notes.Length == 1)
             {
                 cell.Value = cell.Notes[0];
                 updated = true;
+            }
+
+            foreach (byte n in cell.Notes)
+            {
+                // Cell is only in column with a certain note.
+                for (int y = 0; y < Utils.SIZE; y++)
+                {
+                    if (y != cell.Y && _board[cell.X, y].Notes.Contains(n))
+                    {
+                        break;
+                    }
+                    else if (y == Utils.SIZE - 1)
+                    {
+                        cell.Value = n;
+                        updated = true;
+                    }
+                }
+
+                if (cell.Value != 0)
+                    break;
+
+                // Cell is only in row with a certain note.
+                for (int x = 0; x < Utils.SIZE; x++)
+                {
+                    if (x != cell.X && _board[x, cell.Y].Notes.Contains(n)) {
+                        break;
+                    }
+                    else if (x == Utils.SIZE - 1)
+                    {
+                        cell.Value = n;
+                        updated = true;
+                    }
+                }
+
+                if (cell.Value != 0)
+                    break;
+
+                // Cell is only in box with certain note.
+                for (int y = cell.Y / 3 * 3; y < cell.Y / 3 * 3 + 3; y++)
+                {
+                    bool broken = false;
+
+                    for (int x = cell.X / 3 * 3; x < cell.X / 3 * 3 + 3; x++)
+                    {
+                        if (!(y == cell.Y && x == cell.X) && _board[x, y].Notes.Contains(n))
+                        {
+                            broken = true;
+                            break;
+                        }
+                        else if (y == cell.Y / 3 * 3 + 2 && x == cell.X / 3 * 3 + 2)
+                        {
+                            cell.Value = n;
+                            updated = true;
+                        }
+                    }
+
+                    if (broken)
+                        break;
+                }
+
+                if (cell.Value != 0)
+                    break;
             }
         }
 

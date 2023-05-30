@@ -15,7 +15,7 @@ internal class Cell
         set => _value = value;
     }
     public byte[] Notes
-        => _notes.ToArray();
+        => _value == 0 ? _notes.ToArray() : new byte[] { _value };
 
     public Cell(int x, int y, Board board)
     {
