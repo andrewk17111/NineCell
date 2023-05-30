@@ -16,33 +16,61 @@ while (true)
 
 void ProcessInput(ConsoleKey key)
 {
-    if ((key == ConsoleKey.UpArrow || key == ConsoleKey.W) && Console.CursorTop > 1)
+    if (key == ConsoleKey.UpArrow || key == ConsoleKey.W)
     {
-        Console.CursorTop -= 1;
-
-        if (Console.CursorTop % 4 == 0)
+        if (Console.CursorTop == 1)
+        {
+            Console.CursorTop = 11;
+        }
+        else
+        {
             Console.CursorTop -= 1;
-    }
-    else if ((key == ConsoleKey.DownArrow || key == ConsoleKey.S) && Console.CursorTop < 11)
-    {
-        Console.CursorTop += 1;
 
-        if (Console.CursorTop % 4 == 0)
+            if (Console.CursorTop % 4 == 0)
+                Console.CursorTop -= 1;
+        }
+    }
+    else if (key == ConsoleKey.DownArrow || key == ConsoleKey.S)
+    {
+        if (Console.CursorTop == 11)
+        {
+            Console.CursorTop = 1;
+        }
+        else
+        {
             Console.CursorTop += 1;
-    }
-    else if ((key == ConsoleKey.LeftArrow || key == ConsoleKey.A) && Console.CursorLeft > 1)
-    {
-        Console.CursorLeft -= 1;
 
-        if (Console.CursorLeft % 4 == 0)
+            if (Console.CursorTop % 4 == 0)
+                Console.CursorTop += 1;
+        }
+    }
+    else if (key == ConsoleKey.LeftArrow || key == ConsoleKey.A)
+    {
+        if (Console.CursorLeft == 1)
+        {
+            Console.CursorLeft = 11;
+        }
+        else
+        {
             Console.CursorLeft -= 1;
-    }
-    else if ((key == ConsoleKey.RightArrow || key == ConsoleKey.D) && Console.CursorLeft < 11)
-    {
-        Console.CursorLeft += 1;
 
-        if (Console.CursorLeft % 4 == 0)
+            if (Console.CursorLeft % 4 == 0)
+                Console.CursorLeft -= 1;
+        }
+    }
+    else if (key == ConsoleKey.RightArrow || key == ConsoleKey.D)
+    {
+        if (Console.CursorLeft == 11)
+        {
+            Console.CursorLeft = 1;
+        }
+        else
+        {
             Console.CursorLeft += 1;
+
+            if (Console.CursorLeft % 4 == 0)
+                Console.CursorLeft += 1;
+        }
     }
     else if ((key >= ConsoleKey.D0 && key <= ConsoleKey.D9) ||
         (key >= ConsoleKey.NumPad0 && key <= ConsoleKey.NumPad9) ||
