@@ -56,7 +56,7 @@ internal class Cell
     }
 
     public override string ToString()
-        => Value.ToString();
+        => Value == 0 ? " " : Value.ToString();
 
     public static implicit operator byte(Cell cell)
         => cell.Value;
