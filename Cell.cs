@@ -55,6 +55,12 @@ internal class Cell
         return updated;
     }
 
+    public void Reset()
+    {
+        Value = 0;
+        _notes = new List<byte>(Utils.Range(Utils.MIN_VALUE, Utils.MAX_VALUE));
+    }
+
     public override string ToString()
         => Value == 0 ? " " : Value.ToString();
 

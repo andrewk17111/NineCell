@@ -108,6 +108,14 @@ void ProcessInput(ConsoleKey key)
         Console.WriteLine(board);
         Console.SetCursorPosition(1, 1);
     }
+    else if (key == ConsoleKey.R)
+    {
+        (int x, int y) = ConvertPosition(Console.CursorLeft, Console.CursorTop);
+
+        board[x, y].Reset();
+        Console.Write(board[x, y].ToString());
+        Console.CursorLeft -= 1;
+    }
 
     PrintNotes();
 }
