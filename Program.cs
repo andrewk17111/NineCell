@@ -16,28 +16,28 @@ while (true)
 
 void ProcessInput(ConsoleKey key)
 {
-    if (key == ConsoleKey.UpArrow && Console.CursorTop > 1)
+    if ((key == ConsoleKey.UpArrow || key == ConsoleKey.W) && Console.CursorTop > 1)
     {
         Console.CursorTop -= 1;
 
         if (Console.CursorTop % 4 == 0)
             Console.CursorTop -= 1;
     }
-    else if (key == ConsoleKey.DownArrow && Console.CursorTop < 11)
+    else if ((key == ConsoleKey.DownArrow || key == ConsoleKey.S) && Console.CursorTop < 11)
     {
         Console.CursorTop += 1;
 
         if (Console.CursorTop % 4 == 0)
             Console.CursorTop += 1;
     }
-    else if (key == ConsoleKey.LeftArrow && Console.CursorLeft > 1)
+    else if ((key == ConsoleKey.LeftArrow || key == ConsoleKey.A) && Console.CursorLeft > 1)
     {
         Console.CursorLeft -= 1;
 
         if (Console.CursorLeft % 4 == 0)
             Console.CursorLeft -= 1;
     }
-    else if (key == ConsoleKey.RightArrow && Console.CursorLeft < 11)
+    else if ((key == ConsoleKey.RightArrow || key == ConsoleKey.D) && Console.CursorLeft < 11)
     {
         Console.CursorLeft += 1;
 
