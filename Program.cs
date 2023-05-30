@@ -2,8 +2,10 @@
 
 Board board = new Board();
 
+Console.Clear();
 Console.WriteLine(board);
 Console.SetCursorPosition(1, 1);
+PrintNotes();
 
 while (true)
 {
@@ -69,6 +71,14 @@ void ProcessInput(ConsoleKey key)
                 Console.SetCursorPosition(left, top);
             }
         }
+    }
+    else if (key == ConsoleKey.Escape)
+    {
+        board = new Board();
+        Console.Clear();
+        Console.SetCursorPosition(0, 0);
+        Console.WriteLine(board);
+        Console.SetCursorPosition(1, 1);
     }
 
     PrintNotes();
