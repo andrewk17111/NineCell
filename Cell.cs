@@ -35,6 +35,14 @@ internal class Cell
         return true;
     }
 
+    public bool RemoveNote(byte note)
+    {
+        if (!Notes.Contains(note))
+            return false;
+
+        return _notes.Remove(note);
+    }
+
     public bool UpdateNotes()
     {
         bool updated = false;

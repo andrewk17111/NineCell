@@ -17,6 +17,7 @@ while (true)
 void ProcessInput(ConsoleKey key, ConsoleModifiers modifiers)
 {
     bool ctrl = (modifiers & ConsoleModifiers.Control) != 0;
+    bool shift = (modifiers & ConsoleModifiers.Shift) != 0;
 
     if (key == ConsoleKey.UpArrow || key == ConsoleKey.W)
     {
@@ -88,6 +89,20 @@ void ProcessInput(ConsoleKey key, ConsoleModifiers modifiers)
 
             if (Console.CursorLeft % 4 == 0)
                 Console.CursorLeft += 1;
+        }
+    }
+    else if (shift && ((key >= ConsoleKey.D1 && key <= ConsoleKey.D9) ||
+        (key >= ConsoleKey.NumPad1 && key <= ConsoleKey.NumPad9)))
+    {
+        byte value = GetValueFromKey(key);
+        (int x, int y) = ConvertPosition(Console.CursorLeft, Console.CursorTop);
+
+        if (board[x, y].Value == 0)
+        {
+            if (board[x, y].Notes.Contains(value))
+                board[x, y].RemoveNote(value);
+            else
+                board[x, y].AddNote(value);
         }
     }
     else if ((key >= ConsoleKey.D0 && key <= ConsoleKey.D9) ||
