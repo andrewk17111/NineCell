@@ -11,16 +11,22 @@ while (true)
 {
     ConsoleKeyInfo key_info = Console.ReadKey(true);
 
-    ProcessInput(key_info.Key);
+    ProcessInput(key_info.Key, key_info.Modifiers);
 }
 
-void ProcessInput(ConsoleKey key)
+void ProcessInput(ConsoleKey key, ConsoleModifiers modifiers)
 {
+    bool ctrl = (modifiers & ConsoleModifiers.Control) != 0;
+
     if (key == ConsoleKey.UpArrow || key == ConsoleKey.W)
     {
         if (Console.CursorTop == 1)
         {
-            Console.CursorTop = 11;
+            Console.CursorTop = ctrl ? 9 : 11;
+        }
+        else if (ctrl)
+        {
+            Console.CursorTop = (Console.CursorTop - 2) / 4 * 4 + 1;
         }
         else
         {
@@ -32,9 +38,13 @@ void ProcessInput(ConsoleKey key)
     }
     else if (key == ConsoleKey.DownArrow || key == ConsoleKey.S)
     {
-        if (Console.CursorTop == 11)
+        if (Console.CursorTop == 11 || (ctrl && Console.CursorTop > 8))
         {
             Console.CursorTop = 1;
+        }
+        else if (ctrl)
+        {
+            Console.CursorTop = Console.CursorTop / 4 * 4 + 5;
         }
         else
         {
@@ -48,7 +58,11 @@ void ProcessInput(ConsoleKey key)
     {
         if (Console.CursorLeft == 1)
         {
-            Console.CursorLeft = 11;
+            Console.CursorLeft = ctrl ? 9 : 11;
+        }
+        else if (ctrl)
+        {
+            Console.CursorLeft = (Console.CursorLeft - 2) / 4 * 4 + 1;
         }
         else
         {
@@ -60,9 +74,13 @@ void ProcessInput(ConsoleKey key)
     }
     else if (key == ConsoleKey.RightArrow || key == ConsoleKey.D)
     {
-        if (Console.CursorLeft == 11)
+        if (Console.CursorLeft == 11 || (ctrl && Console.CursorLeft > 8))
         {
             Console.CursorLeft = 1;
+        }
+        else if (ctrl)
+        {
+            Console.CursorLeft = Console.CursorLeft / 4 * 4 + 5;
         }
         else
         {
@@ -115,6 +133,10 @@ void ProcessInput(ConsoleKey key)
         board[x, y].Reset();
         Console.Write(board[x, y].ToString());
         Console.CursorLeft -= 1;
+    }
+    else
+    {
+        
     }
 
     PrintNotes();
