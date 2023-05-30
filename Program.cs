@@ -42,7 +42,9 @@ void ProcessInput(ConsoleKey key)
         if (Console.CursorLeft % 4 == 0)
             Console.CursorLeft += 1;
     }
-    else if ((key >= ConsoleKey.D0 && key <= ConsoleKey.D9) || (key >= ConsoleKey.NumPad0 && key <= ConsoleKey.NumPad9))
+    else if ((key >= ConsoleKey.D0 && key <= ConsoleKey.D9) ||
+        (key >= ConsoleKey.NumPad0 && key <= ConsoleKey.NumPad9) ||
+        key == ConsoleKey.Spacebar || key == ConsoleKey.Delete || key == ConsoleKey.Backspace)
     {
         byte value = GetValueFromKey(key);
         (int x, int y) = ConvertPosition(Console.CursorLeft, Console.CursorTop);
@@ -50,7 +52,7 @@ void ProcessInput(ConsoleKey key)
         if (board[x, y] != value)
         {
             board[x, y].Value = value;
-            Console.Write(board[x, y]);
+            Console.Write(board[x, y].ToString());
             Console.CursorLeft -= 1;
         }
     }
