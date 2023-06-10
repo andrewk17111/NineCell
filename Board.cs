@@ -118,6 +118,75 @@ internal class Board
             }
         }
 
+        // Check for naked pairs.
+        for (int y = 0; y < Utils.SIZE; y++)
+        {
+            Cell[]? row = GetRow(y);
+
+            if (row is null)
+                continue;
+
+            for (int x = 0; x < Utils.SIZE; x += 3)
+            {
+                Cell[] sub_row = row[x..(x + 3)].Where(c => c.Value == 0).ToArray();
+
+                if (sub_row.Length == 2 &&
+                    sub_row.Select((c, i) => c.Notes.Length == 2 &&
+                        c.Notes.SequenceEqual(sub_row[(i + 1) % sub_row.Length].Notes)).Aggregate((a, b) => a && b))
+                {
+                    for (int i = 0; i < Utils.SIZE; i++)
+                        if (i < x || i > x + 2)
+                            foreach (byte n in sub_row[0].Notes)
+                                row[i].RemoveNote(n);
+
+                    for (int y2 = sub_row[0].Y / 3 * 3; y2 < sub_row[0].Y / 3 * 3 + 3; y2++)
+                    {
+                        for (int x2 = sub_row[0].X / 3 * 3; x2 < sub_row[0].X / 3 * 3 + 3; x2++)
+                        {
+                            if (sub_row.Select(c => c.X == x2 && c.Y == y2).Aggregate((a, b) => a || b))
+                                continue;
+
+                            _board[x2, y2].RemoveNotes(sub_row[0].Notes);
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int x = 0; x < Utils.SIZE; x++)
+        {
+            Cell[]? col = GetColumn(x);
+
+            if (col is null)
+                continue;
+
+            for (int y = 0; y < Utils.SIZE; y += 3)
+            {
+                Cell[] sub_col = col[y..(y + 3)].Where(c => c.Value == 0).ToArray();
+
+                if (sub_col.Length == 2 &&
+                    sub_col.Select((c, i) => c.Notes.Length == 2 &&
+                        c.Notes.SequenceEqual(sub_col[(i + 1) % sub_col.Length].Notes)).Aggregate((a, b) => a && b))
+                {
+                    for (int i = 0; i < Utils.SIZE; i++)
+                        if (i < x || i > x + 2)
+                            foreach (byte n in sub_col[0].Notes)
+                                col[i].RemoveNote(n);
+
+                    for (int y2 = sub_col[0].Y / 3 * 3; y2 < sub_col[0].Y / 3 * 3 + 3; y2++)
+                    {
+                        for (int x2 = sub_col[0].X / 3 * 3; x2 < sub_col[0].X / 3 * 3 + 3; x2++)
+                        {
+                            if (sub_col.Select(c => c.X == x2 && c.Y == y2).Aggregate((a, b) => a || b))
+                                continue;
+
+                            _board[x2, y2].RemoveNotes(sub_col[0].Notes);
+                        }
+                    }
+                }
+            }
+        }
+
         return updated;
     }
 
