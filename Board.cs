@@ -169,7 +169,7 @@ internal class Board
                         c.Notes.SequenceEqual(sub_col[(i + 1) % sub_col.Length].Notes)).Aggregate((a, b) => a && b))
                 {
                     for (int i = 0; i < Utils.SIZE; i++)
-                        if (i < x || i > x + 2)
+                        if (i < y || i > y + 2)
                             foreach (byte n in sub_col[0].Notes)
                                 col[i].RemoveNote(n);
 
