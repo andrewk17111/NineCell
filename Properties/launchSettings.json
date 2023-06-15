@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "NineCell": {
+      "commandName": "Project"
+    },
+    "Stuck": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Tests/CTC Stuck.txt\""
+    },
+    "Microsoft Easy": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Tests/Microsoft Easy.txt\""
+    }
+  }
+}

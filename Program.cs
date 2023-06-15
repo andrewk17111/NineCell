@@ -8,7 +8,7 @@ if (args.Length > 0 && File.Exists(args[0]))
 
     for (int j = 0; j < lines.Length && j < Utils.SIZE; j++)
     {
-        for (int i = 0; i < lines[i].Length && i < Utils.SIZE; i++)
+        for (int i = 0; i < lines[j].Length && i < Utils.SIZE; i++)
         {
             if (lines[j][i] >= '1' && lines[j][i] <= '9')
             {
