@@ -12,10 +12,15 @@ internal class Cell
     public byte Value
     {
         get => _value;
-        set => _value = value;
+        set => _value = Immutable ? _value : value;
     }
     public byte[] Notes
         => _value == 0 ? _notes.ToArray() : new byte[] { _value };
+    public bool Immutable
+    {
+        get;
+        set;
+    }
 
     public Cell(int x, int y, Board board)
     {
@@ -73,7 +78,7 @@ internal class Cell
     }
 
     public override string ToString()
-        => Value == 0 ? " " : Value.ToString();
+        => Value == 0 ? " " : $"{(Immutable ? AnsiUtils.bold : AnsiUtils.fgcyan)}{Value}{AnsiUtils.reset}";
 
     public static implicit operator byte(Cell cell)
         => cell.Value;

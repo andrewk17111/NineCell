@@ -2,6 +2,23 @@
 
 Board board = new Board();
 
+if (args.Length > 0 && File.Exists(args[0]))
+{
+    string[] lines = File.ReadAllLines(args[0]);
+
+    for (int j = 0; j < lines.Length && j < Utils.SIZE; j++)
+    {
+        for (int i = 0; i < lines[i].Length && i < Utils.SIZE; i++)
+        {
+            if (lines[j][i] >= '1' && lines[j][i] <= '9')
+            {
+                board[i, j].Value = (byte)Math.Max(lines[j][i] - '0', 0);
+                board[i, j].Immutable = true;
+            }
+        }
+    }
+}
+
 Console.Clear();
 Console.WriteLine(board);
 Console.SetCursorPosition(1, 1);
