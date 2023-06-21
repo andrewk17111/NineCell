@@ -41,15 +41,10 @@ internal class Cell
     }
 
     public bool RemoveNote(byte note)
-    {
-        if (!Notes.Contains(note))
-            return false;
-
-        return _notes.Remove(note);
-    }
+        => Notes.Contains(note) && _notes.Remove(note);
 
     public bool RemoveNotes(IEnumerable<byte> notes)
-        => notes.Aggregate(false, (updated, note) => RemoveNote(note) ? true : updated);
+        => notes.Aggregate(false, (updated, note) => RemoveNote(note) || updated);
 
     public bool UpdateNotes()
     {

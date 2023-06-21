@@ -1,4 +1,6 @@
-﻿namespace NineCell;
+﻿using System;
+
+namespace NineCell;
 
 internal class Board
 {
@@ -37,7 +39,7 @@ internal class Board
 
         for (int y = 0; y < Utils.SIZE; y++)
             for (int x = 0; x < Utils.SIZE; x++)
-                updated = _board[x, y].UpdateNotes() ? true : updated;
+                updated = _board[x, y].UpdateNotes() || updated;
 
         return updated;
     }
@@ -128,28 +130,10 @@ internal class Board
 
             for (int x = 0; x < Utils.SIZE; x += 3)
             {
-                Cell[] sub_row = row[x..(x + 3)].Where(c => c.Value == 0).ToArray();
+                Cell[]? box = GetBox(x, y);
 
-                if (sub_row.Length == 2 &&
-                    sub_row.Select((c, i) => c.Notes.Length == 2 &&
-                        c.Notes.SequenceEqual(sub_row[(i + 1) % sub_row.Length].Notes)).Aggregate((a, b) => a && b))
-                {
-                    for (int i = 0; i < Utils.SIZE; i++)
-                        if (i < x || i > x + 2)
-                            foreach (byte n in sub_row[0].Notes)
-                                row[i].RemoveNote(n);
-
-                    for (int y2 = sub_row[0].Y / 3 * 3; y2 < sub_row[0].Y / 3 * 3 + 3; y2++)
-                    {
-                        for (int x2 = sub_row[0].X / 3 * 3; x2 < sub_row[0].X / 3 * 3 + 3; x2++)
-                        {
-                            if (sub_row.Select(c => c.X == x2 && c.Y == y2).Aggregate((a, b) => a || b))
-                                continue;
-
-                            _board[x2, y2].RemoveNotes(sub_row[0].Notes);
-                        }
-                    }
-                }
+                if (box is not null)
+                    updated = HandleNakedPairs(row, box) || updated;
             }
         }
 
@@ -162,30 +146,28 @@ internal class Board
 
             for (int y = 0; y < Utils.SIZE; y += 3)
             {
-                Cell[] sub_col = col[y..(y + 3)].Where(c => c.Value == 0).ToArray();
+                Cell[]? box = GetBox(x, y);
 
-                if (sub_col.Length == 2 &&
-                    sub_col.Select((c, i) => c.Notes.Length == 2 &&
-                        c.Notes.SequenceEqual(sub_col[(i + 1) % sub_col.Length].Notes)).Aggregate((a, b) => a && b))
-                {
-                    for (int i = 0; i < Utils.SIZE; i++)
-                        if (i < y || i > y + 2)
-                            foreach (byte n in sub_col[0].Notes)
-                                col[i].RemoveNote(n);
-
-                    for (int y2 = sub_col[0].Y / 3 * 3; y2 < sub_col[0].Y / 3 * 3 + 3; y2++)
-                    {
-                        for (int x2 = sub_col[0].X / 3 * 3; x2 < sub_col[0].X / 3 * 3 + 3; x2++)
-                        {
-                            if (sub_col.Select(c => c.X == x2 && c.Y == y2).Aggregate((a, b) => a || b))
-                                continue;
-
-                            _board[x2, y2].RemoveNotes(sub_col[0].Notes);
-                        }
-                    }
-                }
+                if (box is not null)
+                    updated = HandleNakedPairs(col, box) || updated;
             }
         }
+
+        return updated;
+    }
+
+    private static bool HandleNakedPairs(Cell[] group1, Cell[] group2)
+    {
+        bool updated = false;
+
+        Cell[] sub_row = group1.Intersect(group2).Where(c => c.Value == 0).ToArray();
+        IEnumerable<byte> notes = sub_row.SelectMany(c => c.Notes).Distinct();
+
+        if (sub_row.Length > 0 && notes.Count() <= sub_row.Length)
+            foreach (Cell cell in group1.Except(group2).Concat(group2.Except(group1)))
+                if (cell.Value == 0 &&
+                    sub_row.Select(c => c.X != cell.X || c.Y != cell.Y).Aggregate((a, b) => a && b))
+                    updated = cell.RemoveNotes(notes) || updated;
 
         return updated;
     }
@@ -214,6 +196,24 @@ internal class Board
 
             for (int y = 0; y < Utils.SIZE; y++)
                 result.Add(_board[index, y]);
+
+            return result.ToArray();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private Cell[]? GetBox(int x, int y)
+    {
+        if (x >= 0 && x < Utils.SIZE && y >= 0 && y < Utils.SIZE)
+        {
+            List<Cell> result = new List<Cell>();
+
+            for (int j = y / 3 * 3; j < y / 3 * 3 + 3; j++)
+                for (int i = x / 3 * 3; i < x / 3 * 3 + 3; i++)
+                    result.Add(_board[i, j]);
 
             return result.ToArray();
         }
