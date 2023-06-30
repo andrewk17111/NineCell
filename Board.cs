@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NineCell;
+﻿namespace NineCell;
 
 internal class Board
 {
@@ -164,7 +162,7 @@ internal class Board
         IEnumerable<byte> notes = sub_row.SelectMany(c => c.Notes).Distinct();
 
         if (sub_row.Length > 0 && notes.Count() <= sub_row.Length)
-            foreach (Cell cell in group1.Except(group2).Concat(group2.Except(group1)))
+            foreach (Cell cell in group1.Concat(group2).Except(sub_row))
                 if (cell.Value == 0 &&
                     sub_row.Select(c => c.X != cell.X || c.Y != cell.Y).Aggregate((a, b) => a && b))
                     updated = cell.RemoveNotes(notes) || updated;
