@@ -138,16 +138,15 @@ void ProcessInput(ConsoleKey key, ConsoleModifiers modifiers)
     }
     else if (key == ConsoleKey.Enter || key == ConsoleKey.Spacebar)
     {
-        if (board.UpdateNotes())
-        {
-            if (board.UpdateValues())
-            {
-                (int left, int top) = Console.GetCursorPosition();
+        board.UpdateNotes();
 
-                Console.SetCursorPosition(0, 0);
-                Console.WriteLine(board);
-                Console.SetCursorPosition(left, top);
-            }
+        if (board.UpdateValues())
+        {
+            (int left, int top) = Console.GetCursorPosition();
+
+            Console.SetCursorPosition(0, 0);
+            Console.WriteLine(board);
+            Console.SetCursorPosition(left, top);
         }
     }
     else if (key == ConsoleKey.Escape)

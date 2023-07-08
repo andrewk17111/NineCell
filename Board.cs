@@ -48,16 +48,17 @@ internal class Board
 
         foreach (Cell cell in _board)
         {
-            // Cell has a single note.
+            // Naked Singles.
             if (cell.Value == 0 && cell.Notes.Length == 1)
             {
                 cell.Value = cell.Notes[0];
                 updated = true;
             }
 
+            // Hidden Singles.
             foreach (byte n in cell.Notes)
             {
-                // Cell is only in column with a certain note.
+                // Column.
                 for (int y = 0; y < Utils.SIZE; y++)
                 {
                     if (y != cell.Y && _board[cell.X, y].Notes.Contains(n))
@@ -74,7 +75,7 @@ internal class Board
                 if (cell.Value != 0)
                     break;
 
-                // Cell is only in row with a certain note.
+                // Row.
                 for (int x = 0; x < Utils.SIZE; x++)
                 {
                     if (x != cell.X && _board[x, cell.Y].Notes.Contains(n)) {
@@ -90,27 +91,21 @@ internal class Board
                 if (cell.Value != 0)
                     break;
 
-                // Cell is only in box with certain note.
-                for (int y = cell.Y / 3 * 3; y < cell.Y / 3 * 3 + 3; y++)
+                // Box.
+                foreach (Cell box_cell in GetBox(cell.X, cell.Y)!)
                 {
-                    bool broken = false;
+                    int x = box_cell.X;
+                    int y = box_cell.Y;
 
-                    for (int x = cell.X / 3 * 3; x < cell.X / 3 * 3 + 3; x++)
+                    if (box_cell != cell && _board[x, y].Notes.Contains(n))
                     {
-                        if (!(y == cell.Y && x == cell.X) && _board[x, y].Notes.Contains(n))
-                        {
-                            broken = true;
-                            break;
-                        }
-                        else if (y == cell.Y / 3 * 3 + 2 && x == cell.X / 3 * 3 + 2)
-                        {
-                            cell.Value = n;
-                            updated = true;
-                        }
-                    }
-
-                    if (broken)
                         break;
+                    }
+                    else if (y == cell.Y / 3 * 3 + 2 && x == cell.X / 3 * 3 + 2)
+                    {
+                        cell.Value = n;
+                        updated = true;
+                    }
                 }
 
                 if (cell.Value != 0)
@@ -119,39 +114,83 @@ internal class Board
         }
 
         // Check for naked pairs.
-        for (int y = 0; y < Utils.SIZE; y++)
+        for (int n = 2; n < 5; n++)
         {
-            Cell[]? row = GetRow(y);
-
-            if (row is null)
-                continue;
-
-            for (int x = 0; x < Utils.SIZE; x += 3)
+            for (int y = 0; y < Utils.SIZE; y++)
             {
-                Cell[]? box = GetBox(x, y);
+                Cell[] row = GetRow(y)!;
+                Cell[][] sets = GetNakedN(n, row, out byte[][] notes);
 
-                if (box is not null)
-                    updated = HandleNakedPairs(row, box) || updated;
+                for (int i = 0; i < sets.Length; i++)
+                    foreach (Cell cell in row.Except(sets[i]))
+                        cell.RemoveNotes(notes[i]);
             }
-        }
 
-        for (int x = 0; x < Utils.SIZE; x++)
-        {
-            Cell[]? col = GetColumn(x);
+            for (int x = 0; x < Utils.SIZE; x++)
+            {
+                Cell[] column = GetColumn(x)!;
+                Cell[][] sets = GetNakedN(n, column, out byte[][] notes);
 
-            if (col is null)
-                continue;
+                for (int i = 0; i < sets.Length; i++)
+                    foreach (Cell cell in column.Except(sets[i]))
+                        cell.RemoveNotes(notes[i]);
+            }
 
             for (int y = 0; y < Utils.SIZE; y += 3)
             {
-                Cell[]? box = GetBox(x, y);
+                for (int x = 0; x < Utils.SIZE; x += 3)
+                {
+                    Cell[] box = GetBox(x, y)!;
+                    Cell[][] sets = GetNakedN(n, box, out byte[][] notes);
 
-                if (box is not null)
-                    updated = HandleNakedPairs(col, box) || updated;
+                    for (int i = 0; i < sets.Length; i++)
+                        foreach (Cell cell in box.Except(sets[i]))
+                            cell.RemoveNotes(notes[i]);
+                }
             }
         }
 
         return updated;
+    }
+    private static Cell[][] GetNSubSet(int n, Cell[]? cells)
+    {
+        if (n == 0 || cells is null)
+            return Array.Empty<Cell[]>();
+        else if (n == 1)
+            return cells.Select(c => new Cell[] { c }).ToArray();
+        
+        List<Cell[]> sets = new List<Cell[]>();
+
+        for (int i = 0; i < cells.Length - n + 1; i++)
+        {
+            IEnumerable<Cell[]> sub_sets = GetNSubSet(n - 1, cells[(i + 1)..]);
+
+            foreach (Cell[] sub_set in  sub_sets)
+                sets.Add(sub_set.Prepend(cells[i]).ToArray());
+        }
+
+        return sets.ToArray();
+    }
+
+    private static Cell[][] GetNakedN(int n, Cell[]? cells, out byte[][] notes)
+    {
+        notes = Array.Empty<byte[]>();
+
+        if (n == 0 || cells is null)
+            return Array.Empty<Cell[]>();
+
+        Cell[][] sets = (from ngram in GetNSubSet(n, cells)
+            where ngram.All(cell => cell.Value == 0)
+            select ngram)
+            .ToArray();
+        byte[][] all_notes = (from set in sets
+            select set.Select(c => c.Notes).Aggregate((a, b) => a.Union(b).ToArray()))
+            .ToArray();
+
+        sets = sets.Where((set, i) => all_notes[i].Length == n).ToArray();
+        notes = all_notes.Where(x => x.Length == n).ToArray();
+
+        return sets;
     }
 
     private static bool HandleNakedPairs(Cell[] group1, Cell[] group2)
