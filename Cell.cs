@@ -46,6 +46,9 @@ internal class Cell
     public bool RemoveNotes(IEnumerable<byte> notes)
         => notes.Aggregate(false, (updated, note) => RemoveNote(note) || updated);
 
+    public void SetNotes(IEnumerable<byte> notes)
+        => _notes = notes?.ToList() ?? new List<byte>();
+
     public bool UpdateNotes()
     {
         bool updated = false;

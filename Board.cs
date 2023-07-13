@@ -39,6 +39,76 @@ internal class Board
             for (int x = 0; x < Utils.SIZE; x++)
                 updated = _board[x, y].UpdateNotes() || updated;
 
+        for (int n = 2; n < 5; n++)
+        {
+            // Naked Pairs/Triples/Quadruples.
+            for (int y = 0; y < Utils.SIZE; y++)
+            {
+                Cell[] row = GetRow(y)!;
+                Cell[][] sets = GetNakedN(n, row, out byte[][] notes);
+
+                for (int i = 0; i < sets.Length; i++)
+                    foreach (Cell cell in row.Except(sets[i]))
+                        cell.RemoveNotes(notes[i]);
+            }
+
+            for (int x = 0; x < Utils.SIZE; x++)
+            {
+                Cell[] column = GetColumn(x)!;
+                Cell[][] sets = GetNakedN(n, column, out byte[][] notes);
+
+                for (int i = 0; i < sets.Length; i++)
+                    foreach (Cell cell in column.Except(sets[i]))
+                        cell.RemoveNotes(notes[i]);
+            }
+
+            for (int y = 0; y < Utils.SIZE; y += 3)
+            {
+                for (int x = 0; x < Utils.SIZE; x += 3)
+                {
+                    Cell[] box = GetBox(x, y)!;
+                    Cell[][] sets = GetNakedN(n, box, out byte[][] notes);
+
+                    for (int i = 0; i < sets.Length; i++)
+                        foreach (Cell cell in box.Except(sets[i]))
+                            cell.RemoveNotes(notes[i]);
+                }
+            }
+
+            // Hidden Pairs/Triples/Quadruples.
+            for (int y = 0; y < Utils.SIZE; y++)
+            {
+                Cell[] row = GetRow(y)!;
+                Cell[][] sets = GetHiddenN(n, row, out byte[][] notes);
+
+                for (int i = 0; i < sets.Length; i++)
+                    foreach (Cell cell in sets[i])
+                        cell.SetNotes(notes[i]);
+            }
+
+            for (int x = 0; x < Utils.SIZE; x++)
+            {
+                Cell[][] sets = GetHiddenN(n, GetColumn(x)!, out byte[][] notes);
+
+                for (int i = 0; i < sets.Length; i++)
+                    foreach (Cell cell in sets[i])
+                        cell.SetNotes(notes[i]);
+            }
+
+            for (int y = 0; y < Utils.SIZE; y += 3)
+            {
+                for (int x = 0; x < Utils.SIZE; x += 3)
+                {
+                    Cell[] box = GetBox(x, y)!;
+                    Cell[][] sets = GetHiddenN(n, box, out byte[][] notes);
+
+                    for (int i = 0; i < sets.Length; i++)
+                        foreach (Cell cell in sets[i])
+                            cell.SetNotes(notes[i]);
+                }
+            }
+        }
+
         return updated;
     }
 
@@ -113,45 +183,9 @@ internal class Board
             }
         }
 
-        // Check for naked pairs.
-        for (int n = 2; n < 5; n++)
-        {
-            for (int y = 0; y < Utils.SIZE; y++)
-            {
-                Cell[] row = GetRow(y)!;
-                Cell[][] sets = GetNakedN(n, row, out byte[][] notes);
-
-                for (int i = 0; i < sets.Length; i++)
-                    foreach (Cell cell in row.Except(sets[i]))
-                        cell.RemoveNotes(notes[i]);
-            }
-
-            for (int x = 0; x < Utils.SIZE; x++)
-            {
-                Cell[] column = GetColumn(x)!;
-                Cell[][] sets = GetNakedN(n, column, out byte[][] notes);
-
-                for (int i = 0; i < sets.Length; i++)
-                    foreach (Cell cell in column.Except(sets[i]))
-                        cell.RemoveNotes(notes[i]);
-            }
-
-            for (int y = 0; y < Utils.SIZE; y += 3)
-            {
-                for (int x = 0; x < Utils.SIZE; x += 3)
-                {
-                    Cell[] box = GetBox(x, y)!;
-                    Cell[][] sets = GetNakedN(n, box, out byte[][] notes);
-
-                    for (int i = 0; i < sets.Length; i++)
-                        foreach (Cell cell in box.Except(sets[i]))
-                            cell.RemoveNotes(notes[i]);
-                }
-            }
-        }
-
         return updated;
     }
+    
     private static Cell[][] GetNSubSet(int n, Cell[]? cells)
     {
         if (n == 0 || cells is null)
@@ -180,11 +214,11 @@ internal class Board
             return Array.Empty<Cell[]>();
 
         Cell[][] sets = (from ngram in GetNSubSet(n, cells)
-            where ngram.All(cell => cell.Value == 0)
-            select ngram)
+                         where ngram.All(cell => cell.Value == 0)
+                         select ngram)
             .ToArray();
         byte[][] all_notes = (from set in sets
-            select set.Select(c => c.Notes).Aggregate((a, b) => a.Union(b).ToArray()))
+                              select set.Select(c => c.Notes).Aggregate((a, b) => a.Union(b).ToArray()))
             .ToArray();
 
         sets = sets.Where((set, i) => all_notes[i].Length == n).ToArray();
@@ -193,20 +227,36 @@ internal class Board
         return sets;
     }
 
-    private static bool HandleNakedPairs(Cell[] group1, Cell[] group2)
+    private static Cell[][] GetHiddenN(int n, Cell[]? cells, out byte[][] notes)
     {
-        bool updated = false;
+        notes = Array.Empty<byte[]>();
 
-        Cell[] sub_row = group1.Intersect(group2).Where(c => c.Value == 0).ToArray();
-        IEnumerable<byte> notes = sub_row.SelectMany(c => c.Notes).Distinct();
+        if (n == 0 || cells is null)
+            return Array.Empty<Cell[]>();
 
-        if (sub_row.Length > 0 && notes.Count() <= sub_row.Length)
-            foreach (Cell cell in group1.Concat(group2).Except(sub_row))
-                if (cell.Value == 0 &&
-                    sub_row.Select(c => c.X != cell.X || c.Y != cell.Y).Aggregate((a, b) => a && b))
-                    updated = cell.RemoveNotes(notes) || updated;
+        Cell[][] sets = (from ngram in GetNSubSet(n, cells)
+                         where ngram.All(cell => cell.Value == 0)
+                         select ngram)
+            .ToArray();
+        byte[][] all_notes = (from set in sets
+                              select set.Select(c => c.Notes).Aggregate((a, b) => a.Intersect(b).ToArray()))
+            .ToArray();
 
-        return updated;
+        for (int i = 0; i < sets.Length; i++)
+        {
+            IEnumerable<Cell> domain = cells.Except(sets[i]).Where(cell => cell.Value == 0).ToArray();
+
+            all_notes[i] = (from note in all_notes[i]
+                            where !domain.Any(cell => cell.Notes.Contains(note))
+                            select note)
+                .ToArray();
+        }
+
+        sets = sets.Where((set, i) => all_notes[i].Length == n)
+            .ToArray();
+        notes = all_notes.Where(x => x.Length == n).ToArray();
+
+        return sets;
     }
 
     private Cell[]? GetRow(int index)
