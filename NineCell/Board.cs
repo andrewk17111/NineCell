@@ -1,8 +1,20 @@
 ﻿namespace NineCell;
 
-internal class Board
+public class Board
 {
     private readonly Cell[,] _board;
+
+    public bool Complete
+    {
+        get
+        {
+            foreach (Cell cell in _board)
+                if (cell.Value == 0)
+                    return false;
+
+            return true;
+        }
+    }
 
     public Cell this[int x, int y] {
         get => _board[x, y];
@@ -148,7 +160,8 @@ internal class Board
                 // Row.
                 for (int x = 0; x < Utils.SIZE; x++)
                 {
-                    if (x != cell.X && _board[x, cell.Y].Notes.Contains(n)) {
+                    if (x != cell.X && _board[x, cell.Y].Notes.Contains(n))
+                    {
                         break;
                     }
                     else if (x == Utils.SIZE - 1)
@@ -342,5 +355,20 @@ internal class Board
 
         output += "└───┴───┴───┘";
         return output;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null || obj.GetType() != typeof(Board))
+            return false;
+
+        Board board = (Board)obj;
+
+        for (int y = 0; y < Utils.SIZE; y++)
+            for (int x = 0; x < Utils.SIZE; x++)
+                if (this[x, y].Value != board[x, y].Value)
+                    return false;
+
+        return true;
     }
 }

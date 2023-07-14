@@ -25,3 +25,11 @@ For the purposes of this project, specific terminology is used in documentation 
 - [ ] **X-Wing**: If two rows or columns have only two cells with the same two notes, then those notes can be removed from all other cells in the same two columns or rows.
 - [ ] **XY-Wing**: If there are three cells, each with only two notes, and one cell shares a row, column or box with the other two (wings), and shares different notes with the wings, and the unshared note is the same between the wings, then the unshared note can be removed from a fourth cell in common with the wings.
 - [ ] **Swordfish**: If three rows or columns have only two or three cells with the same two or three notes, then those notes can be removed from all other cells in the same three columns or rows.
+
+## Testing
+In this repository is a MSTest project. The testing data file is not included because it is too large. The file is a CSV file from Kaggle located [here](https://www.kaggle.com/datasets/radcliffe/3-million-sudoku-puzzles-with-ratings). The fields in the csv file are as follows:
+- **id**: The id of the puzzle
+- **puzzle**: The puzzle in string form of length 81. Empty cells are represented by a period.
+- **solution**: The solution to the puzzle in string form of length 81.
+- **clues**: The number of clues provided in the puzzle.
+- **difficulty**: The difficulty rating of the puzzle, with a maximum difficulty of 8.5.

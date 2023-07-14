@@ -1,6 +1,6 @@
 ﻿namespace NineCell;
 
-internal class Cell
+public class Cell
 {
     private Board _board;
     private byte _value;
