@@ -27,7 +27,7 @@ For the purposes of this project, specific terminology is used in documentation 
 - [ ] **Swordfish**: If three rows or columns have only two or three cells with the same two or three notes, then those notes can be removed from all other cells in the same three columns or rows.
 
 ## Testing
-In this repository is a MSTest project. The testing data file is not included because it is too large. The file is a CSV file from Kaggle located [here](https://www.kaggle.com/datasets/radcliffe/3-million-sudoku-puzzles-with-ratings). The fields in the csv file are as follows:
+In this repository is a MSTest project. The testing data file is not included because it is too large. The original file is a CSV file from Kaggle located [here](https://www.kaggle.com/datasets/radcliffe/3-million-sudoku-puzzles-with-ratings). I have split the CSV file into 9 different CSV files based on each puzzle's difficulty scores. The fields in the csv files are as follows:
 - **id**: The id of the puzzle
 - **puzzle**: The puzzle in string form of length 81. Empty cells are represented by a period.
 - **solution**: The solution to the puzzle in string form of length 81.

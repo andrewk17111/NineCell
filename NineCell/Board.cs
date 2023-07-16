@@ -130,8 +130,11 @@ public class Board
 
         foreach (Cell cell in _board)
         {
+            if (cell.Value != 0)
+                continue;
+
             // Naked Singles.
-            if (cell.Value == 0 && cell.Notes.Length == 1)
+            if (cell.Notes.Length == 1)
             {
                 cell.Value = cell.Notes[0];
                 updated = true;

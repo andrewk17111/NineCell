@@ -7,16 +7,47 @@ namespace NineCellTest;
 public class TestSudokuSolver
 {
     [TestMethod]
-    public void TestSolver()
+    public void Test0()
+        => Assert.IsTrue(RunTest("difficulty0.csv"));
+
+    [TestMethod]
+    public void Test1()
+        => Assert.IsTrue(RunTest("difficulty1.csv"));
+
+    [TestMethod]
+    public void Test2()
+        => Assert.IsTrue(RunTest("difficulty2.csv"));
+
+    [TestMethod]
+    public void Test3()
+        => Assert.IsTrue(RunTest("difficulty3.csv"));
+
+    [TestMethod]
+    public void Test4()
+        => Assert.IsTrue(RunTest("difficulty4.csv"));
+
+    [TestMethod]
+    public void Test5()
+        => Assert.IsTrue(RunTest("difficulty5.csv"));
+
+    [TestMethod]
+    public void Test6()
+        => Assert.IsTrue(RunTest("difficulty6.csv"));
+
+    [TestMethod]
+    public void Test7()
+        => Assert.IsTrue(RunTest("difficulty7.csv"));
+
+    [TestMethod]
+    public void Test8()
+        => Assert.IsTrue(RunTest("difficulty8.csv"));
+
+    private static bool RunTest(string file)
     {
-        using StreamReader reader = new StreamReader("sudoku.csv");
+        using StreamReader reader = new StreamReader(file);
         using TextFieldParser parser = new TextFieldParser(reader);
-        int min_clues_solved = 81;
-        int max_clues_unsolved = 0;
-        float min_difficulty_solved = 10;
-        float max_difficulty_unsolved = 0;
         int solved = 0;
-        int unsolved = 0;
+        List<int> unsolved = new List<int>();
 
         parser.SetDelimiters(",");
         parser.ReadLine();
@@ -25,35 +56,22 @@ public class TestSudokuSolver
         {
             string[] line = parser.ReadFields()!;
             Board board = ReadBoard(line[1]);
-            Board solution = ReadBoard(line[2]);
-            int clues = Convert.ToInt32(line[3]);
-            float difficulty = Convert.ToSingle(line[4]);
             int untouched = 0;
 
             while (!board.Complete && untouched < 5)
                 if (!board.UpdateNotes() || !board.UpdateValues())
                     untouched++;
 
-            if (board.Equals(solution))
-            {
-                min_clues_solved = Math.Min(min_clues_solved, clues);
-                min_difficulty_solved = Math.Min(min_difficulty_solved, difficulty);
+            if (board.Complete && board.Equals(ReadBoard(line[2])))
                 solved++;
-            }
             else
-            {
-                max_clues_unsolved = Math.Max(max_clues_unsolved, clues);
-                max_difficulty_unsolved = Math.Max(max_difficulty_unsolved, difficulty);
-                unsolved++;
-            }
+                unsolved.Add(Convert.ToInt32(line[0]));
         }
 
-        Console.WriteLine($"Clues: {min_clues_solved} {max_clues_unsolved}");
-        Console.WriteLine($"Difficulty: {min_difficulty_solved} {max_difficulty_unsolved}");
-        Console.WriteLine($"{solved}/{unsolved}");
+        Console.WriteLine($"{solved}/{unsolved.Count}");
+        Console.WriteLine(String.Join(", ", unsolved));
 
-        if (unsolved > 0)
-            Assert.Fail();
+        return unsolved.Count == 0;
     }
 
     private static Board ReadBoard(string input)
