@@ -61,7 +61,7 @@ public class Board
 
                 for (int i = 0; i < sets.Length; i++)
                     foreach (Cell cell in row.Except(sets[i]))
-                        cell.RemoveNotes(notes[i]);
+                        updated = cell.RemoveNotes(notes[i]) || updated;
             }
 
             for (int x = 0; x < Utils.SIZE; x++)
@@ -71,7 +71,7 @@ public class Board
 
                 for (int i = 0; i < sets.Length; i++)
                     foreach (Cell cell in column.Except(sets[i]))
-                        cell.RemoveNotes(notes[i]);
+                        updated = cell.RemoveNotes(notes[i]) || updated;
             }
 
             for (int y = 0; y < Utils.SIZE; y += 3)
@@ -83,7 +83,7 @@ public class Board
 
                     for (int i = 0; i < sets.Length; i++)
                         foreach (Cell cell in box.Except(sets[i]))
-                            cell.RemoveNotes(notes[i]);
+                            updated = cell.RemoveNotes(notes[i]) || updated;
                 }
             }
 
@@ -95,7 +95,7 @@ public class Board
 
                 for (int i = 0; i < sets.Length; i++)
                     foreach (Cell cell in sets[i])
-                        cell.SetNotes(notes[i]);
+                        updated = cell.RemoveNotesExcept(notes[i]) || updated;
             }
 
             for (int x = 0; x < Utils.SIZE; x++)
@@ -104,7 +104,7 @@ public class Board
 
                 for (int i = 0; i < sets.Length; i++)
                     foreach (Cell cell in sets[i])
-                        cell.SetNotes(notes[i]);
+                        updated = cell.RemoveNotesExcept(notes[i]) || updated;
             }
 
             for (int y = 0; y < Utils.SIZE; y += 3)
@@ -116,7 +116,7 @@ public class Board
 
                     for (int i = 0; i < sets.Length; i++)
                         foreach (Cell cell in sets[i])
-                            cell.SetNotes(notes[i]);
+                            updated = cell.RemoveNotesExcept(notes[i]) || updated;
                 }
             }
         }

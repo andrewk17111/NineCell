@@ -49,6 +49,7 @@ public class TestSudokuSolver
     {
         using StreamReader reader = new StreamReader(file);
         using TextFieldParser parser = new TextFieldParser(reader);
+
         solved = 0;
         unsolved = new List<int>();
 
@@ -94,8 +95,17 @@ public class TestSudokuSolver
             int untouched = 0;
 
             while (!board.Complete && untouched < 5)
-                if (!board.UpdateNotes() || !board.UpdateValues())
+            {
+                if (board.UpdateNotes())
+                {
+                    board.UpdateValues();
+                    untouched = 0;
+                }
+                else
+                {
                     untouched++;
+                }
+            }
 
             if (board.Complete && board.Equals(ReadBoard(line[2])))
                 solved++;

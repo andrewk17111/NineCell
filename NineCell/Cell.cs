@@ -46,8 +46,8 @@ public class Cell
     public bool RemoveNotes(IEnumerable<byte> notes)
         => notes.Aggregate(false, (updated, note) => RemoveNote(note) || updated);
 
-    public void SetNotes(IEnumerable<byte> notes)
-        => _notes = notes?.ToList() ?? new List<byte>();
+    public bool RemoveNotesExcept(IEnumerable<byte> notes)
+        => RemoveNotes(Utils.Range(Utils.MIN_VALUE, Utils.MAX_VALUE).Except(notes));
 
     public bool UpdateNotes()
     {
@@ -55,16 +55,16 @@ public class Cell
 
         for (int y = 0; y < Utils.SIZE; y++)
             if (y != Y && Notes.Contains(_board[X, y]))
-                updated = _notes.Remove(_board[X, y]) ? true : updated;
+                updated = _notes.Remove(_board[X, y]) || updated;
 
         for (int x = 0; x < Utils.SIZE; x++)
             if (x != X && Notes.Contains(_board[x, Y]))
-                updated = _notes.Remove(_board[x, Y]) ? true : updated;
+                updated = _notes.Remove(_board[x, Y]) || updated;
 
         for (int y = Y / 3 * 3; y < Y / 3 * 3 + 3; y++)
             for (int x = X / 3 * 3; x < X / 3 * 3 + 3; x++)
                 if (!(y == Y && x == X) && Notes.Contains(_board[x, y]))
-                    updated = _notes.Remove(_board[x, y]) ? true : updated;
+                    updated = _notes.Remove(_board[x, y]) || updated;
 
         return updated;
     }
