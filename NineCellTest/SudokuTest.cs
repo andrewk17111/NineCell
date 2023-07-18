@@ -6,6 +6,9 @@ namespace NineCellTest;
 [TestClass]
 public class TestSudokuSolver
 {
+    static int solved = 0;
+    static List<int> unsolved = new List<int>();
+
     [TestMethod]
     public void Test0()
         => Assert.IsTrue(RunTest("difficulty0.csv"));
@@ -46,15 +49,47 @@ public class TestSudokuSolver
     {
         using StreamReader reader = new StreamReader(file);
         using TextFieldParser parser = new TextFieldParser(reader);
-        int solved = 0;
-        List<int> unsolved = new List<int>();
+        solved = 0;
+        unsolved = new List<int>();
 
         parser.SetDelimiters(",");
         parser.ReadLine();
 
+        List<string[]> lines = new List<string[]>();
+
         while (!parser.EndOfData)
+            lines.Add(parser.ReadFields()!);
+        
+        parser.Close();
+
+        Thread[] threads = new Thread[Environment.ProcessorCount];
+        double size = (double)lines.Count / threads.Length;
+
+        for (int i = 0; i < threads.Length; i++)
         {
-            string[] line = parser.ReadFields()!;
+            threads[i] = new Thread(RunSubTest);
+            threads[i].Start(lines.ToArray()[(int)(i * size)..(int)((i + 1) * size)].ToArray());
+        }
+
+        foreach (Thread thread in threads)
+            thread.Join();
+
+
+        Console.WriteLine($"{solved}/{unsolved.Count}");
+        Console.WriteLine(String.Join(", ", unsolved));
+
+        return unsolved.Count == 0;
+    }
+
+    private static void RunSubTest(object? obj)
+    {
+        if (obj is null)
+            return;
+
+        string[][] lines = (string[][])obj;
+
+        foreach (string[] line in lines)
+        {
             Board board = ReadBoard(line[1]);
             int untouched = 0;
 
@@ -67,11 +102,6 @@ public class TestSudokuSolver
             else
                 unsolved.Add(Convert.ToInt32(line[0]));
         }
-
-        Console.WriteLine($"{solved}/{unsolved.Count}");
-        Console.WriteLine(String.Join(", ", unsolved));
-
-        return unsolved.Count == 0;
     }
 
     private static Board ReadBoard(string input)
