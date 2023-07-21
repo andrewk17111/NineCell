@@ -81,7 +81,7 @@ public class TestSudokuSolver
 
         return unsolved.Count == 0;
     }
-
+    
     private static void RunSubTest(object? obj)
     {
         if (obj is null)
@@ -94,18 +94,11 @@ public class TestSudokuSolver
             Board board = ReadBoard(line[1]);
             int untouched = 0;
 
-            while (!board.Complete && untouched < 5)
-            {
-                if (board.UpdateNotes())
-                {
-                    board.UpdateValues();
+            while (!board.Complete && untouched < 3)
+                if (board.UpdateNotes() || board.UpdateValues())
                     untouched = 0;
-                }
                 else
-                {
                     untouched++;
-                }
-            }
 
             if (board.Complete && board.Equals(ReadBoard(line[2])))
                 solved++;
