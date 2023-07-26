@@ -1,4 +1,7 @@
-﻿namespace NineCell;
+﻿using NineCell.Properties;
+using System.Xml.Linq;
+
+namespace NineCell;
 
 public class Board
 {
@@ -201,7 +204,52 @@ public class Board
 
         return updated;
     }
-    
+
+    public string Render()
+    {
+        XNamespace ns = "http://www.w3.org/2000/svg";
+        XDocument svg = XDocument.Parse(Resources.BaseGrid);
+        XElement given_group = new XElement(ns + "g");
+        XElement values_group = new XElement(ns + "g");
+        XElement notes_group = new XElement(ns + "g");
+
+        given_group.SetAttributeValue("id", "given");
+        values_group.SetAttributeValue("id", "values");
+        notes_group.SetAttributeValue("id", "notes");
+
+        foreach (Cell cell in _board)
+        {
+            if (cell.Value == 0)
+            {
+                XElement cell_notes = new XElement(ns + "text", String.Join("", cell.Notes));
+
+                cell_notes.SetAttributeValue("class", "cell-notes");
+                cell_notes.SetAttributeValue("x", cell.X * 100 + 50);
+                cell_notes.SetAttributeValue("y", cell.Y * 100 + 50);
+                cell_notes.SetAttributeValue("count", cell.Notes.Length);
+                notes_group.Add(cell_notes);
+            }
+            else
+            {
+                XElement cell_value = new XElement(ns + "text", cell.Value);
+
+                cell_value.SetAttributeValue("class", "cell-value");
+                cell_value.SetAttributeValue("x", cell.X * 100 + 50);
+                cell_value.SetAttributeValue("y", cell.Y * 100 + 50);
+
+                if (cell.Immutable)
+                    given_group.Add(cell_value);
+                else
+                    values_group.Add(cell_value);
+            }
+        }
+
+        svg.Root!.Add(given_group);
+        svg.Root!.Add(values_group);
+        svg.Root!.Add(notes_group);
+        return svg.ToString();
+    }
+
     private static Cell[][] GetNSubSet(int n, Cell[]? cells)
     {
         if (n == 0 || cells is null)
