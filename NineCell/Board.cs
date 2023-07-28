@@ -4,6 +4,11 @@ public class Board
 {
     private readonly Cell[,] _board;
 
+    // Solving Cache.
+    private readonly List<Cell>[] _rows_unsolved;
+    private readonly List<Cell>[] _columns_unsolved;
+    private readonly List<Cell>[,] _boxes_unsolved;
+
     public bool Complete
     {
         get
@@ -26,6 +31,7 @@ public class Board
     public Board()
     {
         _board = InitBoard();
+        (_rows_unsolved, _columns_unsolved, _boxes_unsolved) = InitCache();
     }
 
     /// <summary>
@@ -43,6 +49,25 @@ public class Board
         return result;
     }
 
+    private (List<Cell>[], List<Cell>[], List<Cell>[,]) InitCache()
+    {
+        List<Cell>[] rows_unsolved = new List<Cell>[Utils.SIZE];
+        List<Cell>[] columns_unsolved = new List<Cell>[Utils.SIZE];
+        List<Cell>[,] boxes_unsolved = new List<Cell>[Utils.SIZE / 3, Utils.SIZE / 3];
+
+        for (int y = 0; y < Utils.SIZE; y++)
+            rows_unsolved[y] = GetRow(y)!.ToList();
+
+        for (int x = 0; x < Utils.SIZE; x++)
+            columns_unsolved[x] = GetColumn(x)!.ToList();
+
+        for (int y = 0; y < Utils.SIZE; y += 3)
+            for (int x = 0; x < Utils.SIZE; x += 3)
+                boxes_unsolved[x / 3, y / 3] = GetBox(x, y)!.ToList();
+
+        return (rows_unsolved, columns_unsolved, boxes_unsolved);
+    }
+
     public bool UpdateNotes()
     {
         bool updated = false;
@@ -56,7 +81,7 @@ public class Board
             // Naked Pairs/Triples/Quadruples.
             for (int y = 0; y < Utils.SIZE; y++)
             {
-                Cell[] row = GetRow(y)!;
+                Cell[] row = GetRowUnsolved(y)!;
                 Cell[][] sets = GetNakedN(n, row, out byte[][] notes);
 
                 for (int i = 0; i < sets.Length; i++)
@@ -66,7 +91,7 @@ public class Board
 
             for (int x = 0; x < Utils.SIZE; x++)
             {
-                Cell[] column = GetColumn(x)!;
+                Cell[] column = GetColumnUnsolved(x)!;
                 Cell[][] sets = GetNakedN(n, column, out byte[][] notes);
 
                 for (int i = 0; i < sets.Length; i++)
@@ -78,7 +103,7 @@ public class Board
             {
                 for (int x = 0; x < Utils.SIZE; x += 3)
                 {
-                    Cell[] box = GetBox(x, y)!;
+                    Cell[] box = GetBoxUnsolved(x, y)!;
                     Cell[][] sets = GetNakedN(n, box, out byte[][] notes);
 
                     for (int i = 0; i < sets.Length; i++)
@@ -90,7 +115,7 @@ public class Board
             // Hidden Pairs/Triples/Quadruples.
             for (int y = 0; y < Utils.SIZE; y++)
             {
-                Cell[] row = GetRow(y)!;
+                Cell[] row = GetRowUnsolved(y)!;
                 Cell[][] sets = GetHiddenN(n, row, out byte[][] notes);
 
                 for (int i = 0; i < sets.Length; i++)
@@ -100,7 +125,7 @@ public class Board
 
             for (int x = 0; x < Utils.SIZE; x++)
             {
-                Cell[][] sets = GetHiddenN(n, GetColumn(x)!, out byte[][] notes);
+                Cell[][] sets = GetHiddenN(n, GetColumnUnsolved(x)!, out byte[][] notes);
 
                 for (int i = 0; i < sets.Length; i++)
                     foreach (Cell cell in sets[i])
@@ -111,7 +136,7 @@ public class Board
             {
                 for (int x = 0; x < Utils.SIZE; x += 3)
                 {
-                    Cell[] box = GetBox(x, y)!;
+                    Cell[] box = GetBoxUnsolved(x, y)!;
                     Cell[][] sets = GetHiddenN(n, box, out byte[][] notes);
 
                     for (int i = 0; i < sets.Length; i++)
@@ -127,8 +152,9 @@ public class Board
     public bool UpdateValues()
     {
         bool updated = false;
+        IEnumerable<Cell> unsolved_cells = _rows_unsolved.SelectMany(c => c);
 
-        foreach (Cell cell in _board)
+        foreach (Cell cell in unsolved_cells)
         {
             if (cell.Value != 0)
                 continue;
@@ -204,7 +230,7 @@ public class Board
     
     private static Cell[][] GetNSubSet(int n, Cell[]? cells)
     {
-        if (n == 0 || cells is null)
+        if (n == 0 || cells is null || cells.Length == 0)
             return Array.Empty<Cell[]>();
         else if (n == 1)
             return cells.Select(c => new Cell[] { c }).ToArray();
@@ -324,6 +350,57 @@ public class Board
         {
             return null;
         }
+    }
+
+    private Cell[]? GetRowUnsolved(int y)
+    {
+        if (y < 0 || y >= Utils.SIZE)
+            return null;
+
+        for (int x = 0; x < _rows_unsolved[y].Count; x++)
+        {
+            if (_rows_unsolved[y][x].Value != 0)
+            {
+                _rows_unsolved[y].RemoveAt(x);
+                x--;
+            }
+        }
+
+        return _rows_unsolved[y].ToArray();
+    }
+
+    private Cell[]? GetColumnUnsolved(int x)
+    {
+        if (x < 0 || x >= Utils.SIZE)
+            return null;
+
+        for (int y = 0; y < _columns_unsolved[x].Count; y++)
+        {
+            if (_columns_unsolved[x][y].Value != 0)
+            {
+                _columns_unsolved[x].RemoveAt(y);
+                y--;
+            }
+        }
+
+        return _columns_unsolved[x].ToArray();
+    }
+
+    private Cell[]? GetBoxUnsolved(int x, int y)
+    {
+        if (x < 0 || x >= Utils.SIZE || y < 0 || y >= Utils.SIZE)
+            return null;
+
+        for (int i = 0; i < _boxes_unsolved[x / 3, y / 3].Count; i++)
+        {
+            if (_boxes_unsolved[x / 3, y / 3][i].Value != 0)
+            {
+                _boxes_unsolved[x / 3, y / 3].RemoveAt(i);
+                i--;
+            }
+        }
+
+        return _boxes_unsolved[x / 3, y / 3].ToArray();
     }
 
     public override string ToString()
