@@ -5,7 +5,9 @@ VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NineCell", "NineCell\NineCell.csproj", "{D7EE7204-2579-4C36-AB54-97BF511E0A45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NineCellTest", "NineCellTest\NineCellTest.csproj", "{2D7445DF-864E-4CD7-9957-B109F578F53D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NineCellTest", "NineCellTest\NineCellTest.csproj", "{2D7445DF-864E-4CD7-9957-B109F578F53D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NineCellWeb", "NineCellWeb\NineCellWeb.csproj", "{4E5C15F4-29E5-4023-B01B-55ECA2F802B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{2D7445DF-864E-4CD7-9957-B109F578F53D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D7445DF-864E-4CD7-9957-B109F578F53D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D7445DF-864E-4CD7-9957-B109F578F53D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E5C15F4-29E5-4023-B01B-55ECA2F802B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E5C15F4-29E5-4023-B01B-55ECA2F802B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E5C15F4-29E5-4023-B01B-55ECA2F802B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E5C15F4-29E5-4023-B01B-55ECA2F802B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

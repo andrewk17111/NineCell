@@ -205,7 +205,7 @@ public class Board
         return updated;
     }
 
-    public string Render()
+    public string Render(int x, int y)
     {
         XNamespace ns = "http://www.w3.org/2000/svg";
         XDocument svg = XDocument.Parse(Resources.BaseGrid);
@@ -241,6 +241,18 @@ public class Board
                     given_group.Add(cell_value);
                 else
                     values_group.Add(cell_value);
+            }
+
+            if (cell.X == x && cell.Y == y)
+            {
+                XElement border = new XElement(ns + "rect");
+
+                border.SetAttributeValue("class", "selected-cell");
+                border.SetAttributeValue("width", "95");
+                border.SetAttributeValue("height", "95");
+                border.SetAttributeValue("x", cell.X * 100 + 2.5);
+                border.SetAttributeValue("y", cell.Y * 100 + 2.5);
+                svg.Root!.Add(border);
             }
         }
 

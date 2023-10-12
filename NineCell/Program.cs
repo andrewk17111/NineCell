@@ -20,6 +20,8 @@ if (args.Length > 0 && File.Exists(args[0]))
 }
 
 Console.Clear();
+Console.WriteLine(board.Render(0, 0));
+Thread.Sleep(-1);
 Console.WriteLine(board);
 Console.SetCursorPosition(1, 1);
 PrintNotes();
@@ -164,10 +166,6 @@ void ProcessInput(ConsoleKey key, ConsoleModifiers modifiers)
         board[x, y].Reset();
         Console.Write(board[x, y].ToString());
         Console.CursorLeft -= 1;
-    }
-    else
-    {
-        
     }
 
     PrintNotes();

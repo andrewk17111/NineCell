@@ -1,0 +1,151 @@
+﻿@page "/"
+@inject IJSRuntime JsRuntime
+
+<div id="interface" tabindex="-1" @onkeydown="HandleKeyDown" @onkeydown:preventDefault="@prevent_default_keys">
+    @((MarkupString)svgrender)
+</div>
+
+
+@code {
+    Board board = new Board();
+    private (int x, int y) selected_pos = (0, 0);
+    string svgrender = "";
+    bool prevent_default_keys = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        svgrender = board.Render(selected_pos.x, selected_pos.y);
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key != "Control" && e.Key != "Alt" && e.Key != "Shift")
+        {
+            prevent_default_keys = ProcessInput(e.Code, e.CtrlKey, e.AltKey, e.ShiftKey);
+
+            if (prevent_default_keys)
+                svgrender = board.Render(selected_pos.x, selected_pos.y);
+        }
+    }
+
+    private bool ProcessInput(string key_code, bool ctrl, bool alt, bool shift)
+    {
+        bool output = false;
+
+        if (key_code == "ArrowUp" || key_code == "KeyW")
+        {
+            if (selected_pos.y == 0)
+            {
+                selected_pos.y = ctrl ? 6 : 8;
+            }
+            else if (ctrl)
+            {
+                selected_pos.y = (selected_pos.y - 1) / 3 * 3;
+            }
+            else
+            {
+                selected_pos.y -= 1;
+            }
+
+            output = true;
+        }
+        else if (key_code == "ArrowDown" || key_code == "KeyS")
+        {
+            if (selected_pos.y == 8 || (ctrl && selected_pos.y > 5))
+            {
+                selected_pos.y = 0;
+            }
+            else if (ctrl)
+            {
+                selected_pos.y = selected_pos.y / 3 * 3 + 3;
+            }
+            else
+            {
+                selected_pos.y += 1;
+            }
+
+            output = true;
+        }
+        else if (key_code == "ArrowLeft" || key_code == "KeyA")
+        {
+            if (selected_pos.x == 0)
+            {
+                selected_pos.x = ctrl ? 6 : 8;
+            }
+            else if (ctrl)
+            {
+                selected_pos.x = (selected_pos.x - 1) / 3 * 3;
+            }
+            else
+            {
+                selected_pos.x -= 1;
+            }
+
+            output = true;
+        }
+        else if (key_code == "ArrowRight" || key_code == "KeyD")
+        {
+            if (selected_pos.x == 8 || (ctrl && selected_pos.x > 5))
+            {
+                selected_pos.x = 0;
+            }
+            else if (ctrl)
+            {
+                selected_pos.x = selected_pos.x / 3 * 3 + 3;
+            }
+            else
+            {
+                selected_pos.x += 1;
+            }
+
+            output = true;
+        }
+        else if (shift && (key_code.StartsWith("Digit") && (key_code[^1] >= '1' && key_code[^1] <= '9')))
+        {
+            byte value = GetValueFromKey(key_code);
+
+            if (board[selected_pos.x, selected_pos.y].Value == 0)
+            {
+                if (board[selected_pos.x, selected_pos.y].Notes.Contains(value))
+                    board[selected_pos.x, selected_pos.y].RemoveNote(value);
+                else
+                    board[selected_pos.x, selected_pos.y].AddNote(value);
+                
+                output = true;
+            }
+        }
+        else if (((key_code.StartsWith("Digit") || key_code.StartsWith("Numpad")) && key_code[^1] >= '0' && key_code[^1] <= '9') ||
+            key_code == " " || key_code == "Delete" || key_code == "Backspace")
+        {
+            byte value = GetValueFromKey(key_code);
+
+            if (board[selected_pos.x, selected_pos.y] != value)
+            {
+                board[selected_pos.x, selected_pos.y].Value = value;
+                output = true;
+            }
+        }
+        else if (key_code == "Enter")
+        {
+            if (board.UpdateNotes() || board.UpdateValues())
+                output = true;
+        }
+        else if (key_code == "Escape")
+        {
+            board = new Board();
+            output = true;
+        }
+        else if (key_code == "r")
+        {
+            board[selected_pos.x, selected_pos.y].Reset();
+            output = true;
+        }
+
+        return output;
+    }
+
+    private static byte GetValueFromKey(string key)
+        => key == "Delete" || key == "Backspace" || key == " "
+            ? (byte)0
+            : (byte)Int32.Parse($"{key[^1]}");
+}
