@@ -1,6 +1,9 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO;
 @inject IJSRuntime JsRuntime
 
+<InputFile style="float:right" OnChange="@LoadFiles" />
 <div id="interface" tabindex="-1" @onkeydown="HandleKeyDown" @onkeydown:preventDefault="@prevent_default_keys">
     @((MarkupString)svgrender)
 </div>
@@ -12,10 +15,11 @@
     string svgrender = "";
     bool prevent_default_keys = false;
 
+    private void UpdateSvgRender()
+        => svgrender = board.Render(selected_pos.x, selected_pos.y);
+
     protected override async Task OnInitializedAsync()
-    {
-        svgrender = board.Render(selected_pos.x, selected_pos.y);
-    }
+        => UpdateSvgRender();
 
     private void HandleKeyDown(KeyboardEventArgs e)
     {
@@ -24,7 +28,52 @@
             prevent_default_keys = ProcessInput(e.Code, e.CtrlKey, e.AltKey, e.ShiftKey);
 
             if (prevent_default_keys)
-                svgrender = board.Render(selected_pos.x, selected_pos.y);
+                UpdateSvgRender();
+        }
+    }
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        IBrowserFile file = e.File;
+        int j = 0;
+        int i = 0;
+
+        if (file != null)
+        {
+            try
+            {
+                Stream file_stream = file.OpenReadStream();
+                StreamReader reader = new StreamReader(file_stream);
+                string[] lines = (await reader.ReadToEndAsync())
+                    .ReplaceLineEndings()
+                    .Split(Environment.NewLine);
+
+                for (j = 0; j < lines.Length && j < 9; j++)
+                {
+                    string line = lines[j];
+
+                    for (i = 0; i < line.Length && i < 9; i++)
+                    {
+                        if (line[i] >= '1' && line[i] <= '9')
+                        {
+                            board[i, j].Value = (byte)Math.Max(line[i] - '0', 0);
+                            board[i, j].Immutable = true;
+                        }
+                        else
+                        {
+                            board[i, j].Value = (byte)0;
+                            board[i, j].Immutable = false;
+                        }
+                    }
+                }
+
+                reader.Close();
+                UpdateSvgRender();
+            }
+            catch (Exception ex)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", $"{ex}");
+            }
         }
     }
 
@@ -110,12 +159,12 @@
                     board[selected_pos.x, selected_pos.y].RemoveNote(value);
                 else
                     board[selected_pos.x, selected_pos.y].AddNote(value);
-                
+
                 output = true;
             }
         }
         else if (((key_code.StartsWith("Digit") || key_code.StartsWith("Numpad")) && key_code[^1] >= '0' && key_code[^1] <= '9') ||
-            key_code == " " || key_code == "Delete" || key_code == "Backspace")
+            key_code == " ")
         {
             byte value = GetValueFromKey(key_code);
 
@@ -135,7 +184,7 @@
             board = new Board();
             output = true;
         }
-        else if (key_code == "r")
+        else if (key_code == "Delete" || key_code == "Backspace")
         {
             board[selected_pos.x, selected_pos.y].Reset();
             output = true;
