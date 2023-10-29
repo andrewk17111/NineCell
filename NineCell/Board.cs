@@ -301,7 +301,7 @@ public class Board
         return sets;
     }
 
-    private Cell[]? GetRow(int index)
+    public Cell[]? GetRow(int index)
     {
         if (index >= 0 && index < Utils.SIZE) {
             List<Cell> result = new List<Cell>();
@@ -317,7 +317,7 @@ public class Board
         }
     }
 
-    private Cell[]? GetColumn(int index)
+    public Cell[]? GetColumn(int index)
     {
         if (index >= 0 && index < Utils.SIZE)
         {
@@ -334,7 +334,7 @@ public class Board
         }
     }
 
-    private Cell[]? GetBox(int x, int y)
+    public Cell[]? GetBox(int x, int y)
     {
         if (x >= 0 && x < Utils.SIZE && y >= 0 && y < Utils.SIZE)
         {
@@ -352,7 +352,7 @@ public class Board
         }
     }
 
-    private Cell[]? GetRowUnsolved(int y)
+    public Cell[]? GetRowUnsolved(int y)
     {
         if (y < 0 || y >= Utils.SIZE)
             return null;
@@ -369,7 +369,7 @@ public class Board
         return _rows_unsolved[y].ToArray();
     }
 
-    private Cell[]? GetColumnUnsolved(int x)
+    public Cell[]? GetColumnUnsolved(int x)
     {
         if (x < 0 || x >= Utils.SIZE)
             return null;
@@ -386,7 +386,7 @@ public class Board
         return _columns_unsolved[x].ToArray();
     }
 
-    private Cell[]? GetBoxUnsolved(int x, int y)
+    public Cell[]? GetBoxUnsolved(int x, int y)
     {
         if (x < 0 || x >= Utils.SIZE || y < 0 || y >= Utils.SIZE)
             return null;
@@ -394,6 +394,57 @@ public class Board
         for (int i = 0; i < _boxes_unsolved[x / 3, y / 3].Count; i++)
         {
             if (_boxes_unsolved[x / 3, y / 3][i].Value != 0)
+            {
+                _boxes_unsolved[x / 3, y / 3].RemoveAt(i);
+                i--;
+            }
+        }
+
+        return _boxes_unsolved[x / 3, y / 3].ToArray();
+    }
+
+    public Cell[]? GetRowSolved(int y)
+    {
+        if (y < 0 || y >= Utils.SIZE)
+            return null;
+
+        for (int x = 0; x < _rows_unsolved[y].Count; x++)
+        {
+            if (_rows_unsolved[y][x].Value == 0)
+            {
+                _rows_unsolved[y].RemoveAt(x);
+                x--;
+            }
+        }
+
+        return _rows_unsolved[y].ToArray();
+    }
+
+    public Cell[]? GetColumnSolved(int x)
+    {
+        if (x < 0 || x >= Utils.SIZE)
+            return null;
+
+        for (int y = 0; y < _columns_unsolved[x].Count; y++)
+        {
+            if (_columns_unsolved[x][y].Value == 0)
+            {
+                _columns_unsolved[x].RemoveAt(y);
+                y--;
+            }
+        }
+
+        return _columns_unsolved[x].ToArray();
+    }
+
+    public Cell[]? GetBoxSolved(int x, int y)
+    {
+        if (x < 0 || x >= Utils.SIZE || y < 0 || y >= Utils.SIZE)
+            return null;
+
+        for (int i = 0; i < _boxes_unsolved[x / 3, y / 3].Count; i++)
+        {
+            if (_boxes_unsolved[x / 3, y / 3][i].Value == 0)
             {
                 _boxes_unsolved[x / 3, y / 3].RemoveAt(i);
                 i--;

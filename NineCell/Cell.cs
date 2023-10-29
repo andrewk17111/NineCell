@@ -14,8 +14,10 @@ public class Cell
         get => _value;
         set => _value = Immutable ? _value : value;
     }
+
     public byte[] Notes
         => _value == 0 ? _notes.ToArray() : new byte[] { _value };
+
     public bool Immutable
     {
         get;
@@ -51,20 +53,19 @@ public class Cell
 
     public bool UpdateNotes()
     {
+        if (Value != 0)
+            return false;
+
         bool updated = false;
 
-        for (int y = 0; y < Utils.SIZE; y++)
-            if (y != Y && Notes.Contains(_board[X, y]))
-                updated = _notes.Remove(_board[X, y]) || updated;
+        IEnumerable<Cell> pool = _board.GetRow(Y)!
+            .Union(_board.GetColumn(X)!)
+            .Union(_board.GetBox(X, Y)!)
+            /*.Distinct()*/;
 
-        for (int x = 0; x < Utils.SIZE; x++)
-            if (x != X && Notes.Contains(_board[x, Y]))
-                updated = _notes.Remove(_board[x, Y]) || updated;
-
-        for (int y = Y / 3 * 3; y < Y / 3 * 3 + 3; y++)
-            for (int x = X / 3 * 3; x < X / 3 * 3 + 3; x++)
-                if (!(y == Y && x == X) && Notes.Contains(_board[x, y]))
-                    updated = _notes.Remove(_board[x, y]) || updated;
+        foreach (Cell cell in pool)
+            if (Notes.Contains(cell))
+                updated = _notes.Remove(cell) || updated;
 
         return updated;
     }
